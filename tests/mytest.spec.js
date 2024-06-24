@@ -1,8 +1,16 @@
 const { test, expect } = require('@playwright/test');
+//Se ejecuta antes de todas las pruebas una vez
+test.beforeAll('Setup', async () => {
+    console.log("Starting execution")
+});
+
+test.beforeEach("Test setup", async ({ page }) => {
+    await page.goto("https://www.saucedemo.com/");
+})
 
 test('Login demo', async ({ page }) => {
+    test.slow();
 
-    await page.goto('https://www.saucedemo.com/');
     await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
     await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
     await page.getByRole('button', { name: 'Login' }).click();
@@ -18,7 +26,7 @@ test('Login demo', async ({ page }) => {
 
 test('Login demo by css class and Id', async ({ page }) => {
 
-    await page.goto('https://www.saucedemo.com/');
+
     //Para localizar por Id se usa la palabra 'locator' y el numeral para buscarlo
     await page.locator('#user-name').fill('standard_user');
     await page.locator('#password').fill('secret_sauce');
@@ -41,7 +49,7 @@ test('Login demo by css class and Id', async ({ page }) => {
 
 test('Login demo by css class, Id, data-test', async ({ page }) => {
 
-    await page.goto('https://www.saucedemo.com/');
+
 
     //by id
     await page.locator('#user-name').fill('standard_user');
@@ -61,9 +69,9 @@ test('Login demo by css class, Id, data-test', async ({ page }) => {
     await expect(page).toHaveURL(/.*inventory.html/);
 });
 
-test('Login demo and first price', async ({ page }) => {
+test('Login demo and first price @fast', async ({ page }) => {
 
-    await page.goto('https://www.saucedemo.com/');
+
     await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
     await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
     await page.getByRole('button', { name: 'Login' }).click();
@@ -75,7 +83,7 @@ test('Login demo and first price', async ({ page }) => {
 
 test('Login demo order low to high price and first price', async ({ page }) => {
 
-    await page.goto('https://www.saucedemo.com/');
+
     await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
     await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
     await page.getByRole('button', { name: 'Login' }).click();
@@ -86,7 +94,12 @@ test('Login demo order low to high price and first price', async ({ page }) => {
     //await page.locator('.product_sort_container').selectOption("lohi");
 
     //seleccionar un elemento por label de la lista
-    await page.locator('.product_sort_container').selectOption({ label: "Price (low to high)" });
+    //await page.locator('.product_sort_container').selectOption({ label: "Price (low to high)" });
+
+    //key press se puede utilizar press para simular presionar una tecla del teclado
+    await page.locator('.product_sort_container').press("ArrowDown");
+    await page.locator('.product_sort_container').press("ArrowDown");
+
     //comprobar que el primer elemento tenga ese texto
     await expect(await page.locator("(//div[contains(@class, 'inventory_item_price')])[1]")).toHaveText("$7.99");
     //comprobar que el ultimo elemento tenga ese texto
