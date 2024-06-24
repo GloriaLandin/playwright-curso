@@ -49,8 +49,48 @@ test('Login demo by css class, Id, data-test', async ({ page }) => {
     await page.locator('id=password').fill('secret_sauce');
     // by data-test (el atributo se agrega desde la etapa de desarrollo)
     await page.locator('data-test=login-button').click();
+    //se usa cuando hay muchas redirecciones a otras paginas al momento de hacer clic, y al final llega
+    //a la pagina "inventory.html". Espera a que llegue esa URL para poder continuar el codigo
+    await page.waitForURL('**/inventory.html');
     // by css class
     const productsTitle = await page.locator('.title');
     await expect(productsTitle).toHaveText('Products');
     await expect(productsTitle).toBeVisible();
+    //comprueba la url, y .* indica que puede haber cualquier tipo de informacion, 
+    //para no depender del cambio de dominio
+    await expect(page).toHaveURL(/.*inventory.html/);
+});
+
+test('Login demo and first price', async ({ page }) => {
+
+    await page.goto('https://www.saucedemo.com/');
+    await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
+    await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    await expect(page.getByText('Products')).toBeVisible();
+
+    await expect(await page.locator("(//div[contains(@class, 'inventory_item_price')])[1]")).toHaveText("$29.99")
+});
+
+test('Login demo order low to high price and first price', async ({ page }) => {
+
+    await page.goto('https://www.saucedemo.com/');
+    await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
+    await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    await expect(page.getByText('Products')).toBeVisible();
+
+    //seleccionar un elemento por valor de la lista
+    //await page.locator('.product_sort_container').selectOption("lohi");
+
+    //seleccionar un elemento por label de la lista
+    await page.locator('.product_sort_container').selectOption({ label: "Price (low to high)" });
+    //comprobar que el primer elemento tenga ese texto
+    await expect(await page.locator("(//div[contains(@class, 'inventory_item_price')])[1]")).toHaveText("$7.99");
+    //comprobar que el ultimo elemento tenga ese texto
+    await expect(await page.locator("(//div[contains(@class, 'inventory_item_price')])[last()]")).toHaveText("$49.99");
+
+
 });
