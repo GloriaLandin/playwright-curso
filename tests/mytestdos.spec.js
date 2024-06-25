@@ -1,14 +1,13 @@
 const { test, expect } = require('@playwright/test');
 //Se ejecuta antes de todas las pruebas una vez
-import { login } from './testutils';
+
 
 test.beforeAll('Setup', async () => {
     console.log("Starting execution")
 });
 //Se ejecuta antes de cada una de las pruebas
 test.beforeEach("Test setup", async ({ page }) => {
-    //se utiliza path relativo porque en el archivo playwright.config.js ya se establecio la BaseUrl
-    await page.goto("/");
+    await page.goto("https://www.saucedemo.com/");
 })
 
 test.afterAll("Complete", async () => {
@@ -90,7 +89,14 @@ test.describe("Login and price", async () => {
 
     test('Login demo and first price @fast', async ({ page }) => {
         //pasos para cada prueba
-        await login(page);
+        await test.step('Login', async () => {
+
+            await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
+            await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
+            await page.getByRole('button', { name: 'Login' }).click();
+
+            await expect(page.getByText('Products')).toBeVisible();
+        });
 
         await test.step('Login', async () => {
             await expect(await page.locator("(//div[contains(@class, 'inventory_item_price')])[1]")).toHaveText("$29.99")
@@ -99,7 +105,12 @@ test.describe("Login and price", async () => {
 
     test('Login demo order low to high price and first price', async ({ page }) => {
 
-        await login(page);
+
+        await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
+        await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        await expect(page.getByText('Products')).toBeVisible();
 
         //seleccionar un elemento por valor de la lista
         //await page.locator('.product_sort_container').selectOption("lohi");
