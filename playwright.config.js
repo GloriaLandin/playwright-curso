@@ -11,12 +11,15 @@ const { defineConfig, devices } = require('@playwright/test');
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
+  //testIgnore: "*example.spec.js" /*ignora las pruebas que se encuentren en todo el archivo de example.spec.js*/
+  //testMatch: "*example.spec.js" /*ejecuta solo las pruebas que se encuentren en todo el archivo de example.spec.js*/
+  // directorio que va a alojar nuestras pruebas
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
+  /* Retry on CI only */ //se puede dejar como 'retries: 3' para hacer solo 3 intentos
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
@@ -29,7 +32,8 @@ module.exports = defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    headless: true,
+    //headless true: no abre navegadores. false: abre navegadores
+    headless: process.env.CI? true: false,
     baseURL: "https://www.saucedemo.com/",
   },
 
