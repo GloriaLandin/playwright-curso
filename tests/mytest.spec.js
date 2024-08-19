@@ -5,7 +5,8 @@ import { login } from './testutils';
 test.beforeAll('Setup', async () => {
     console.log("Starting execution")
 });
-//Se ejecuta antes de cada una de las pruebas
+//Se ejecuta antes de cada una de las pruebas.
+//page es para ubicar dentro del navegador todas las opciones de la prueba
 test.beforeEach("Test setup", async ({ page }) => {
     //se utiliza path relativo porque en el archivo playwright.config.js ya se establecio la BaseUrl
     await page.goto("/");
@@ -22,10 +23,15 @@ test.afterEach("Complete", async ({ page }, testInfo) => {
 
 //describe solo agrupa el tipo de pruebas que lo contiene
 test.describe("Login", async () => {
-
+//test.skip (evita esa prueba)
+//test.only (prueba solo esa prueba)
     test('Login demo', async ({ page }) => {
-        test.slow();
-
+        test.slow(); //espera un tiempo mayor para encontrar los elementos cuando una pagina esta muy cargada o tarda mucho en cargar
+//para lanzarlo desde la linea de comandos para que ejecute las pruebas slow o fast se escribe 'npx playwright test --grep "@slow"'
+//getByRole ubica todos los elementos de la pagina
+//los inputs de tipo text son textbox
+//fill llena con datos algo
+//el id y se llaman username, password, value:login
         await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
         await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
         await page.getByRole('button', { name: 'Login' }).click();
@@ -34,7 +40,7 @@ test.describe("Login", async () => {
         await page.screenshot({ path: 'saucedemoportal.png', fullPage: true });
         // captura de pantalla solo del texto buscado
         await page.getByText('Swag Labs').screenshot({ path: 'titlescreenshot.png' });
-
+//expect porque espera un texto llamado Products, ya que es un span
         await expect(page.getByText('Products')).toBeVisible();
 
     });
@@ -90,6 +96,7 @@ test.describe("Login and price", async () => {
 
     test('Login demo and first price @fast', async ({ page }) => {
         //pasos para cada prueba
+        //login(page) reutiliza el codigo de login para que no tengamos que estarlo poniendo en cada caso de prueba. viene del archivo testutils.js y se declara como funcion y se manda llamar desde arriba con un import
         await login(page);
 
         await test.step('Login', async () => {
